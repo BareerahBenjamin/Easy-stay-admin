@@ -44,7 +44,7 @@ npm install
 
 # 3. 启动开发服务器
 npm run dev
-
+```
 ## 项目结构（主要部分）
 src/
 ├── pages/
