@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# 易宿酒店预订平台 - B端管理系统（商户 & 管理员后台）
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**项目名称**：易宿酒店预订平台（结营大作业 - B端部分）  
+**实现范围**：商户端酒店信息录入/编辑 + 管理员端酒店信息审核/发布/下线  
+**技术栈**：React 18 + TypeScript + Vite + Ant Design 5 + Zustand（localStorage 持久化）  
 
-Currently, two official plugins are available:
+## 项目说明
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+本项目为“易宿酒店预订平台”结营大作业的 **B 端管理系统**（PC 站点），完整实现了题目要求的以下功能：
 
-## React Compiler
+- 用户登录 / 注册（支持商户 & 管理员两种角色）
+- 商户端：酒店信息录入 / 编辑 / 修改（覆盖所有必须维度 + 部分可选维度）
+- 管理员端：酒店信息审核 / 发布 / 下线（支持拒绝原因录入、状态恢复）
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+数据通过 Zustand + localStorage 实现**无后端持久化 + 实时更新**，模拟完整审核发布流程。
 
-## Expanding the ESLint configuration
+## 已实现的核心功能（对应评分权重）
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| 页面                     | 功能描述                                                                 | 对应权重 | 实现亮点                              |
+|--------------------------|--------------------------------------------------------------------------|----------|---------------------------------------|
+| 登录 / 注册              | 支持选择角色注册，登录后自动识别角色跳转相应后台                          | 5 分     | 角色区分 + localStorage 持久化        |
+| 商户 - 酒店信息录入/编辑 | 支持中英文名称、地址、星级、开业时间、动态房型列表（增删改）、图片上传预览、附近设施、优惠信息等 | 10 分    | 动态 Form.List + 图片 base64 预览     |
+| 管理员 - 审核/发布/下线  | 酒店列表展示、审核（通过/拒绝+原因）、发布、上/下线（可恢复）、状态流转   | 10 分    | 完整状态机 + 拒绝原因录入与显示       |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 技术亮点 & 实现细节
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **数据持久化**：Zustand + persist middleware，所有酒店信息、用户信息刷新后依然保留
+- **动态表单**：使用 Ant Design Form.List 实现房型多条目增删，支持价格、折扣设置
+- **图片上传**：本地 base64 预览（无需真实后端）
+- **角色权限**：商户只能看到/编辑自己的酒店，管理员可操作全部
+- **状态管理**：auditing → approved → published / rejected / offline 全流程支持
+- **UI 框架**：Ant Design 5，响应式布局，适配主流 PC 分辨率
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 快速启动
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# 1. 克隆项目（或从 git 仓库拉取）
+git clone <你的仓库地址>
+cd easy-stay-admin
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+# 2. 安装依赖
+npm install
+
+# 3. 启动开发服务器
+npm run dev
+
+## 项目结构（主要部分）
+src/
+├── pages/
+│   ├── Login.tsx
+│   ├── Register.tsx
+│   ├── Merchant/
+│   │   ├── Layout.tsx
+│   │   └── HotelForm.tsx          # 商户新增/编辑酒店
+│   └── Admin/
+│       ├── Layout.tsx
+│       └── HotelList.tsx          # 管理员审核列表
+├── store/
+│   ├── useAuth.ts                 # 用户认证状态
+│   └── useHotelStore.ts           # 酒店数据状态
+├── types/
+│   └── hotel.ts                   # 类型定义（Role, Hotel, HotelStatus 等）
+└── router.tsx                     # 路由 + 权限保护
